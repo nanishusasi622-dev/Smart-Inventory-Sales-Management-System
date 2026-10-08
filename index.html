@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Inventory & Sales Management System</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <h1>🛒 Smart Inventory &amp; Sales Management System</h1>
+  <nav>
+    <button class="tab active" data-tab="dashboard">Dashboard</button>
+    <button class="tab" data-tab="inventory">Inventory</button>
+    <button class="tab" data-tab="sales">New Sale</button>
+    <button class="tab" data-tab="history">Sales History</button>
+    <button class="tab" data-tab="customers">Customers</button>
+    <button class="tab" data-tab="reports">Reports</button>
+  </nav>
+</header>
+
+<main>
+  <!-- DASHBOARD -->
+  <section id="dashboard" class="panel active">
+    <div class="cards">
+      <div class="card"><h2 id="stRevenue">₹0</h2><p>Total revenue</p></div>
+      <div class="card"><h2 id="stProfit">₹0</h2><p>Total profit</p></div>
+      <div class="card"><h2 id="stSales">0</h2><p>Total sales</p></div>
+      <div class="card"><h2 id="stStockValue">₹0</h2><p>Stock value</p></div>
+      <div class="card warn"><h2 id="stLow">0</h2><p>Low stock items</p></div>
+    </div>
+    <div class="grid2">
+      <div>
+        <h3>⚠️ Low stock alerts</h3>
+        <table><thead><tr><th>SKU</th><th>Name</th><th>Qty</th><th>Reorder</th></tr></thead><tbody id="lowBody"></tbody></table>
+      </div>
+      <div>
+        <h3>🏆 Top selling products</h3>
+        <table><thead><tr><th>Product</th><th>Units sold</th><th>Revenue</th></tr></thead><tbody id="topBody"></tbody></table>
+      </div>
+    </div>
+    <h3>Last 7 days revenue</h3>
+    <div id="chart" class="chart"></div>
+  </section>
+
+  <!-- INVENTORY -->
+  <section id="inventory" class="panel">
+    <div class="bar">
+      <input id="search" placeholder="Search name / SKU / category">
+      <button id="addProductBtn">+ Add Product</button>
+      <button id="restockBtn" class="secondary">Restock</button>
+      <button id="exportInv" class="secondary">Export CSV</button>
+    </div>
+    <table><thead><tr><th>SKU</th><th>Name</th><th>Category</th><th>Cost</th><th>Price</th><th>Qty</th><th>Actions</th></tr></thead>
+    <tbody id="productBody"></tbody></table>
+  </section>
+
+  <!-- NEW SALE -->
+  <section id="sales" class="panel">
+    <div class="grid2">
+      <div>
+        <h3>Add items</h3>
+        <div class="bar">
+          <select id="saleProduct"></select>
+          <input id="saleQty" type="number" min="1" value="1" style="max-width:90px">
+          <button id="addItemBtn">Add</button>
+        </div>
+        <div class="bar">
+          <select id="saleCustomer"></select>
+          <input id="saleDiscount" type="number" min="0" max="100" value="0" placeholder="Discount %" style="max-width:130px">
+          <select id="salePayment"><option>Cash</option><option>UPI</option><option>Card</option></select>
+        </div>
+      </div>
+      <div>
+        <h3>Current bill</h3>
+        <table><thead><tr><th>Item</th><th>Qty</th><th>Price</th><th>Total</th><th></th></tr></thead><tbody id="cartBody"></tbody></table>
+        <div class="totals">
+          <div>Subtotal: <b id="cSub">₹0.00</b></div>
+          <div>Discount: <b id="cDisc">₹0.00</b></div>
+          <div>GST (<span id="gstRate">5</span>%): <b id="cGst">₹0.00</b></div>
+          <div class="grand">Grand Total: <b id="cTotal">₹0.00</b></div>
+        </div>
+        <button id="checkoutBtn">Complete Sale</button>
+        <button id="clearCartBtn" class="secondary">Clear</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- HISTORY -->
+  <section id="history" class="panel">
+    <div class="bar"><button id="exportSales" class="secondary">Export CSV</button></div>
+    <table><thead><tr><th>Invoice</th><th>Date</th><th>Customer</th><th>Items</th><th>Payment</th><th>Total</th><th></th></tr></thead>
+    <tbody id="historyBody"></tbody></table>
+  </section>
+
+  <!-- CUSTOMERS -->
+  <section id="customers" class="panel">
+    <div class="bar">
+      <input id="cuName" placeholder="Customer name">
+      <input id="cuPhone" placeholder="Phone">
+      <button id="cuBtn">+ Add Customer</button>
+    </div>
+    <table><thead><tr><th>Name</th><th>Phone</th><th>Purchases</th><th>Total spent</th><th></th></tr></thead>
+    <tbody id="cuBody"></tbody></table>
+  </section>
+
+  <!-- REPORTS -->
+  <section id="reports" class="panel">
+    <h3>Sales by category</h3>
+    <table><thead><tr><th>Category</th><th>Units sold</th><th>Revenue</th><th>Profit</th></tr></thead><tbody id="catBody"></tbody></table>
+    <h3>Sales by payment method</h3>
+    <table><thead><tr><th>Method</th><th>Bills</th><th>Amount</th></tr></thead><tbody id="payBody"></tbody></table>
+    <button id="resetBtn" class="danger">Reset all data</button>
+  </section>
+</main>
+
+<!-- Product modal -->
+<div id="modal" class="modal hidden">
+  <form id="productForm" class="modal-box">
+    <h3 id="modalTitle">Add Product</h3>
+    <label>SKU<input id="fSku" required></label>
+    <label>Name<input id="fName" required></label>
+    <label>Category<input id="fCategory"></label>
+    <label>Cost price (₹)<input id="fCost" type="number" step="0.01" min="0" value="0"></label>
+    <label>Selling price (₹)<input id="fPrice" type="number" step="0.01" min="0" value="0"></label>
+    <label>Quantity<input id="fQty" type="number" min="0" value="0"></label>
+    <label>Reorder level<input id="fReorder" type="number" min="0" value="5"></label>
+    <div class="modal-actions">
+      <button type="button" id="cancelBtn" class="secondary">Cancel</button>
+      <button type="submit">Save</button>
+    </div>
+  </form>
+</div>
+
+<!-- Invoice modal -->
+<div id="invModal" class="modal hidden">
+  <div class="modal-box" id="invBox"></div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
